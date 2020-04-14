@@ -11,6 +11,22 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+/*
+   TASKS:
+   1. Implement bluetooth capabilities
+    a. Connect to bluetooth device
+    b. Check whether armed or not and update UI
+    c. Implement app arming and disarming alarm
+    d. Save user location when disconnected from bike
+    e. Bluetooth connections in background
+   2. Make UI Responsive
+    a. Button should change color, text, and lock image when pressed
+    b. When out of range of device, no button, text stating whether alarm active or not
+    c. Text should state whether bike in range or not
+   3. Change map annotation to be white and contain bike emoji
+ */
+
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mMapView;
