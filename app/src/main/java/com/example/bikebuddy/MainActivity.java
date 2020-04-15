@@ -3,7 +3,14 @@ package com.example.bikebuddy;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -11,11 +18,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.UUID;
+
+import static androidx.core.app.ActivityCompat.startActivityForResult;
+
 /*
    TASKS:
    1. Implement bluetooth capabilities
-    a. Connect to bluetooth device
-    b. Check whether armed or not and update UI
     c. Implement app arming and disarming alarm
     d. Save user location when disconnected from bike
     e. Bluetooth connections in background
@@ -28,16 +37,48 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-
     private MapView mMapView;
-
+    private TextView mConnectionHeader;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private static final String TAG = MainActivity.class.getSimpleName();
+    public final static int REQUEST_ENABLE_BT = 1;
+
+    private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+                mConnectionHeader.setText(R.string.bike_connected);
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                Log.d(TAG, "Disconnected from bluetooth");
+                mConnectionHeader.setText(R.string.bike_disconnected);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setupMapView(savedInstanceState);
+
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        assert bluetoothManager != null;
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+
+        // Ensures Bluetooth is available on the device and it is enabled. If not,
+        // displays a dialog requesting user permission to enable Bluetooth.
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            Intent intent = new Intent(this, BluetoothLeService.class);
+            startService(intent);
+        }
+    }
+
+    private void setupMapView(Bundle savedInstanceState) {
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
         // objects or sub-Bundles.
