@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setupMapView(savedInstanceState);
 
+        this.getSupportActionBar().hide();
+
         mArmButton = findViewById(R.id.armButton);
         mArmButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
