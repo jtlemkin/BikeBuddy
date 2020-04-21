@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,8 +30,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
     f. Start bluetooth service with jobscheduler
    2. Make UI Responsive
     a. Button should change color, text, and lock image when pressed
-    b. When out of range of device, no button, text stating whether alarm active or not
-    c. Text should state whether bike in range or not
    3. Change map annotation to be white and contain bike emoji
  */
 
@@ -83,6 +82,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Intent intent = new Intent(SHOULD_TOGGLE_ALARM);
                 intent.putExtra("isArmed", isChecked);
                 sendBroadcast(intent);
+
+                if (isChecked) {
+                    buttonView.setBackgroundColor(Color.GRAY);
+                    buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
+                } else {
+                    buttonView.setBackgroundColor(Color.RED);
+                    buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline_black_24dp, 0, 0, 0);
+                }
+
             }
         });
 
