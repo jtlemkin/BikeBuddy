@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -32,6 +33,7 @@ public class BluetoothLeService extends Service {
     private int connectionState = STATE_DISCONNECTED;
     private Handler handler;
     private boolean mScanning;
+    private BluetoothGattCharacteristic characteristic;
 
     // 10 second scan period
     private static final long SCAN_PERIOD = 10000;
@@ -41,16 +43,29 @@ public class BluetoothLeService extends Service {
     private static final int STATE_CONNECTED = 2;
 
     public final static String ACTION_GATT_CONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
+            "com.example.bikebuddy.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
+            "com.example.bikebuddy.ACTION_GATT_DISCONNECTED";
     public final static String ACTION_GATT_SERVICES_DISCOVERED =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
+            "com.example.bikebuddy.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE =
-            "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
+            "com.example.bikebuddy.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
 
     public final static UUID alarmUUID = UUID.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
+
+    private final BroadcastReceiver shouldWriteReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (MainActivity.SHOULD_TOGGLE_ALARM.equals(action)) {
+                assert characteristic != null;
+                int isArmed = intent.getIntExtra("isArmed", -1);
+                assert isArmed != -1;
+                characteristic.setValue(isArmed, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -59,7 +74,8 @@ public class BluetoothLeService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         assert bluetoothManager != null;
         bluetoothAdapter = bluetoothManager.getAdapter();
 
@@ -93,7 +109,8 @@ public class BluetoothLeService extends Service {
         @Override
         public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
             bluetoothDeviceAddress = bluetoothDevice.getAddress();
-            bluetoothGatt = bluetoothDevice.connectGatt(getApplicationContext(), false, gattCallback);
+            bluetoothGatt = bluetoothDevice.connectGatt(getApplicationContext(),
+                                                        false, gattCallback);
         }
     };
 
@@ -150,7 +167,8 @@ public class BluetoothLeService extends Service {
     private void broadcastUpdate(final String action,
                                 final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        int isArmed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        int isArmed =
+                characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
         intent.putExtra("isArmed", isArmed);
         sendBroadcast(intent);
     }

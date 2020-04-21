@@ -40,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:background="#F44336"
+        android:checked="false"
         android:drawableStart="@drawable/ic_lock_outline_black_32dp"
         android:drawablePadding="5dp"
         android:padding="10dp"

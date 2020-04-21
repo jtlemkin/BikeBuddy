@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -24,7 +25,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /*
    TASKS:
    1. Implement bluetooth capabilities
-    c. Implement app arming and disarming alarm
     d. Save user location when disconnected from bike
     e. Bluetooth connections in background
     f. Start bluetooth service with jobscheduler
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String TAG = MainActivity.class.getSimpleName();
     public final static int REQUEST_ENABLE_BT = 1;
     public final static int ARMING_UNKNOWN = -1;
+    public final static String SHOULD_TOGGLE_ALARM = "com.example.bikebuddy.SHOULD_TOGGLE_ALARM";
 
     private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -80,6 +81,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         setupMapView(savedInstanceState);
+
+        mArmButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Intent intent = new Intent(SHOULD_TOGGLE_ALARM);
+                intent.putExtra("isArmed", isChecked);
+                sendBroadcast(intent);
+            }
+        });
 
         mPreferences = getPreferences(Context.MODE_PRIVATE);
 
@@ -175,5 +184,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onLowMemory();
         mMapView.onLowMemory();
     }
-
 }
