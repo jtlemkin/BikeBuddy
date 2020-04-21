@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnectionHeader.setText(R.string.bike_connected);
                 mArmButton.setVisibility(View.VISIBLE);
+                mArmButton.setChecked(mPreferences.getInt("isArmed", 0) == 1);
                 mArmedText.setVisibility(View.GONE);
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.d(TAG, "Disconnected from bluetooth");
