@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setupMapView(savedInstanceState);
 
+        mArmButton = findViewById(R.id.armButton);
         mArmButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Intent intent = new Intent(SHOULD_TOGGLE_ALARM);
@@ -90,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 
         mConnectionHeader = findViewById(R.id.connectionHeader);
-        mArmButton = findViewById(R.id.armButton);
         mArmedText = findViewById(R.id.armedText);
 
         if (mPreferences.getInt("isArmed", 0) == 0) {
