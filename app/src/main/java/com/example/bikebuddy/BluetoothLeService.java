@@ -15,6 +15,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import static androidx.core.app.ActivityCompat.startActivityForResult;
@@ -69,11 +71,9 @@ public class BluetoothLeService extends Service {
     private void scanLeDevice(final boolean enable) {
         UUID[] uuids = new UUID[]{alarmUUID};
 
-        handler = new Handler(Looper.myLooper());
-
         //Stops bluetooth scanning after scan period
         if (enable) {
-            handler.postDelayed(new Runnable() {
+            new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
                     mScanning = false;
