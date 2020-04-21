@@ -1,5 +1,6 @@
 package com.example.bikebuddy;
 
+import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,10 +12,17 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,16 +32,14 @@ import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
-
-    private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
-    private String bluetoothDeviceAddress;
     private BluetoothGatt bluetoothGatt;
-    private BluetoothDevice bluetoothDevice;
-    private int connectionState = STATE_DISCONNECTED;
-    private Handler handler;
-    private boolean mScanning;
     private BluetoothGattCharacteristic characteristic;
+    private boolean mScanning;
+    private int connectionState;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private SharedPreferences sharedPreferences;
+
 
     // 10 second scan period
     private static final long SCAN_PERIOD = 10000;
@@ -50,7 +56,6 @@ public class BluetoothLeService extends Service {
             "com.example.bikebuddy.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE =
             "com.example.bikebuddy.ACTION_DATA_AVAILABLE";
-    public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
 
     public final static UUID alarmUUID = UUID.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
 
@@ -69,6 +74,8 @@ public class BluetoothLeService extends Service {
 
     @Override
     public void onCreate() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        sharedPreferences = getSharedPreferences(MainActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         Log.d(TAG, "Starting bluetooth service");
     }
 
@@ -108,9 +115,8 @@ public class BluetoothLeService extends Service {
     private final BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
-            bluetoothDeviceAddress = bluetoothDevice.getAddress();
             bluetoothGatt = bluetoothDevice.connectGatt(getApplicationContext(),
-                                                        false, gattCallback);
+                    false, gattCallback);
         }
     };
 
@@ -128,6 +134,23 @@ public class BluetoothLeService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 connectionState = STATE_DISCONNECTED;
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                double longitude = location.getLongitude();
+                                double latitude = location.getLatitude();
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putLong("longitude", Double.doubleToRawLongBits(longitude));
+                                editor.putLong("latitude", Double.doubleToRawLongBits(latitude));
+                                editor.apply();
+                            }
+                        }
+                    });
+                }
                 Log.i(TAG, "Disconnected from GATT server");
                 broadcastUpdate(intentAction);
             }
@@ -148,14 +171,17 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            }
-        }
+                //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicWrite(gatt, characteristic, status);
+                int isArmed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, -1);
+                assert isArmed != -1;
+
+                if (isArmed == 0 || isArmed == 1) {
+                    editor.putInt("isArmed", isArmed);
+                    editor.apply();
+                }
+            }
         }
     };
 
@@ -167,9 +193,7 @@ public class BluetoothLeService extends Service {
     private void broadcastUpdate(final String action,
                                 final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        int isArmed =
-                characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
-        intent.putExtra("isArmed", isArmed);
+
         sendBroadcast(intent);
     }
 

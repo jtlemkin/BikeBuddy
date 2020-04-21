@@ -25,7 +25,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /*
    TASKS:
    1. Implement bluetooth capabilities
-    d. Save user location when disconnected from bike
     e. Bluetooth connections in background
     f. Start bluetooth service with jobscheduler
    2. Make UI Responsive
@@ -47,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public final static int REQUEST_ENABLE_BT = 1;
     public final static int ARMING_UNKNOWN = -1;
     public final static String SHOULD_TOGGLE_ALARM = "com.example.bikebuddy.SHOULD_TOGGLE_ALARM";
+    public final static String PREFERENCE_FILE_KEY = "com.example.bikebuddy.PREFERENCE_FILE_KEY";
 
     private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -63,14 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mArmButton.setVisibility(View.GONE);
                 mArmedText.setVisibility(View.VISIBLE);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                int isArmed = intent.getIntExtra("isArmed", ARMING_UNKNOWN);
-
-                SharedPreferences.Editor editor = mPreferences.edit();
-
-                if (isArmed == 0 || isArmed == 1) {
-                    editor.putInt("isArmed", isArmed);
-                    editor.apply();
-                }
+                Log.d(TAG, "ACTION_DATA_AVAILABLE unimplemented");
             }
         }
     };
@@ -90,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        mPreferences = getPreferences(Context.MODE_PRIVATE);
+        mPreferences = getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         assert bluetoothManager != null;
@@ -164,7 +157,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        double latitude = Double.longBitsToDouble(mPreferences.getLong("latitude", 0));
+        double longitude = Double.longBitsToDouble(mPreferences.getLong("longitude", 0));
+        map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Marker"));
     }
 
     @Override
