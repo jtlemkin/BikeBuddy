@@ -4,4 +4,6 @@
     <string name="bike_disconnected">Bike Disconnected</string>
     <string name="activate_alarm">Activate Alarm</string>
     <string name="deactivate_alarm">Deactivate Alarm</string>
+    <string name="alarm_inactive">Alarm Inactive</string>
+    <string name="alarm_active">Alarm Active</string>
 </resources>

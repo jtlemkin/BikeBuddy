@@ -8,9 +8,12 @@ import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -18,16 +21,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.UUID;
-
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-
 /*
    TASKS:
    1. Implement bluetooth capabilities
     c. Implement app arming and disarming alarm
     d. Save user location when disconnected from bike
     e. Bluetooth connections in background
+    f. Start bluetooth service with jobscheduler
    2. Make UI Responsive
     a. Button should change color, text, and lock image when pressed
     b. When out of range of device, no button, text stating whether alarm active or not
@@ -39,9 +39,13 @@ import static androidx.core.app.ActivityCompat.startActivityForResult;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
     private TextView mConnectionHeader;
+    private TextView mArmedText;
+    private ToggleButton mArmButton;
+    private SharedPreferences mPreferences;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private static final String TAG = MainActivity.class.getSimpleName();
     public final static int REQUEST_ENABLE_BT = 1;
+    public final static int ARMING_UNKNOWN = -1;
 
     private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -49,9 +53,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnectionHeader.setText(R.string.bike_connected);
+                mArmButton.setVisibility(View.VISIBLE);
+                mArmedText.setVisibility(View.GONE);
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.d(TAG, "Disconnected from bluetooth");
                 mConnectionHeader.setText(R.string.bike_disconnected);
+                mArmButton.setVisibility(View.GONE);
+                mArmedText.setVisibility(View.VISIBLE);
+            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
+                int isArmed = intent.getIntExtra("isArmed", ARMING_UNKNOWN);
+
+                SharedPreferences.Editor editor = mPreferences.edit();
+
+                if (isArmed == 0 || isArmed == 1) {
+                    editor.putInt("isArmed", isArmed);
+                    editor.apply();
+                }
             }
         }
     };
@@ -63,9 +80,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setupMapView(savedInstanceState);
 
+        mPreferences = getPreferences(Context.MODE_PRIVATE);
+
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         assert bluetoothManager != null;
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+
+        mConnectionHeader = findViewById(R.id.connectionHeader);
+        mArmButton = findViewById(R.id.armButton);
+        mArmedText = findViewById(R.id.armedText);
+
+        if (mPreferences.getInt("isArmed", 0) == 0) {
+            mArmedText.setText(R.string.alarm_active);
+        } else {
+            mArmedText.setText(R.string.alarm_inactive);
+        }
 
         // Ensures Bluetooth is available on the device and it is enabled. If not,
         // displays a dialog requesting user permission to enable Bluetooth.

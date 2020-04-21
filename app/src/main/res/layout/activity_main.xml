@@ -19,7 +19,7 @@
         android:layout_weight="1" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/connectionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -35,7 +35,7 @@
         android:layout_weight="1" />
 
     <ToggleButton
-        android:id="@+id/toggleButton"
+        android:id="@+id/armButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0"
@@ -46,7 +46,16 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="#FFFFFF"
         android:textOff="@string/activate_alarm"
-        android:textOn="@string/deactivate_alarm" />
+        android:textOn="@string/deactivate_alarm"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/armedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/alarm_inactive"
+        android:textAlignment="center"
+        android:textSize="36sp" />
 
     <Space
         android:layout_width="match_parent"

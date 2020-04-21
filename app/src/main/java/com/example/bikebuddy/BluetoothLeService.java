@@ -150,11 +150,8 @@ public class BluetoothLeService extends Service {
     private void broadcastUpdate(final String action,
                                 final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-
-        /*
-            Insert code for handling reading characteristic here
-         */
-
+        int isArmed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        intent.putExtra("isArmed", isArmed);
         sendBroadcast(intent);
     }
 
