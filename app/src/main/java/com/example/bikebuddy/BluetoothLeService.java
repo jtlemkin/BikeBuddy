@@ -9,6 +9,11 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,12 +23,15 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.ParcelUuid;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -35,6 +43,7 @@ public class BluetoothLeService extends Service {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGatt bluetoothGatt;
     private BluetoothGattCharacteristic characteristic;
+    private BluetoothLeScanner bluetoothLeScanner;
     private boolean mScanning;
     private int connectionState;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -57,7 +66,7 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_DATA_AVAILABLE =
             "com.example.bikebuddy.ACTION_DATA_AVAILABLE";
 
-    public final static UUID alarmUUID = UUID.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
+    public final static ParcelUuid alarmUUID = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
 
     private final BroadcastReceiver shouldWriteReceiver = new BroadcastReceiver() {
         @Override
@@ -85,6 +94,7 @@ public class BluetoothLeService extends Service {
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         assert bluetoothManager != null;
         bluetoothAdapter = bluetoothManager.getAdapter();
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
         scanLeDevice(true);
 
@@ -92,31 +102,40 @@ public class BluetoothLeService extends Service {
     }
 
     private void scanLeDevice(final boolean enable) {
-        UUID[] uuids = new UUID[]{alarmUUID};
-
         //Stops bluetooth scanning after scan period
         if (enable) {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
                     mScanning = false;
-                    bluetoothAdapter.stopLeScan(leScanCallback);
+                    bluetoothLeScanner.stopScan(leScanCallback);
+                    bluetoothLeScanner.flushPendingScanResults(leScanCallback);
                 }
             }, SCAN_PERIOD);
 
             mScanning = true;
-            bluetoothAdapter.startLeScan(uuids, leScanCallback);
+            List<ScanFilter> filters = new ArrayList<>();
+            //Use this to maybe better filter devices
+            ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(alarmUUID).build();
+            filters.add(scanFilter);
+            //This can also maybe be better
+            ScanSettings scanSettings = new ScanSettings.Builder()
+                    .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+                    .build();
+            bluetoothLeScanner.startScan(filters, scanSettings, leScanCallback);
         } else {
             mScanning = false;
-            bluetoothAdapter.stopLeScan(leScanCallback);
+            bluetoothLeScanner.startScan(leScanCallback);
         }
     }
 
-    private final BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
+    private final ScanCallback leScanCallback = new ScanCallback() {
         @Override
-        public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
-            bluetoothGatt = bluetoothDevice.connectGatt(getApplicationContext(),
-                    false, gattCallback);
+        public void onScanResult(int callbackType, ScanResult result) {
+            if (callbackType == ScanSettings.CALLBACK_TYPE_ALL_MATCHES) {
+                bluetoothGatt = result.getDevice().connectGatt(getApplicationContext(),
+                        false, gattCallback);
+            }
         }
     };
 
