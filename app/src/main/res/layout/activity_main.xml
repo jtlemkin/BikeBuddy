@@ -17,6 +17,7 @@
         android:id="@+id/batteryText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:text="@string/battery_life"
         android:textAlignment="textEnd"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"

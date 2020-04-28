@@ -6,5 +6,5 @@
     <string name="deactivate_alarm">Deactivate Alarm</string>
     <string name="alarm_inactive">Alarm Inactive</string>
     <string name="alarm_active">Alarm Active</string>
-    <string name="battery_life">Device Life:</string>
+    <string name="battery_life">Device Life: %1$s</string>
 </resources>

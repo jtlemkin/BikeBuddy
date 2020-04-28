@@ -86,6 +86,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setupBatteryText() {
         mBatteryText = findViewById(R.id.batteryText);
+        int savedPercentage = mPreferences.getInt("batteryLife", -1);
+        String percentageText;
+
+        if (savedPercentage == -1) {
+            percentageText = "Undefined";
+        } else {
+            percentageText = Integer.toString(savedPercentage);
+        }
+
+        String newLabel = getString(R.string.battery_life, percentageText);
+        mBatteryText.setText(newLabel);
     }
 
     private void setupArmedText() {
