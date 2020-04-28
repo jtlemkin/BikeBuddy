@@ -7,4 +7,7 @@
     <string name="alarm_inactive">Alarm Inactive</string>
     <string name="alarm_active">Alarm Active</string>
     <string name="battery_life">Device Life: %1$s</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
