@@ -54,15 +54,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                mConnectionHeader.setText(R.string.bike_connected);
-                mArmButton.setVisibility(View.VISIBLE);
-                mArmButton.setChecked(mPreferences.getInt("isArmed", 0) == 1);
-                mArmedText.setVisibility(View.GONE);
+                Log.d(TAG, "Connected to bluetooth");
+                updateUIOnDeviceConnect();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Log.d(TAG, "Disconnected from bluetooth");
-                mConnectionHeader.setText(R.string.bike_disconnected);
-                mArmButton.setVisibility(View.GONE);
-                mArmedText.setVisibility(View.VISIBLE);
+                updateUIOnDeviceDisconnect();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 Log.d(TAG, "ACTION_DATA_AVAILABLE unimplemented");
             }
@@ -82,6 +78,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mConnectionHeader = findViewById(R.id.connectionHeader);
         setupArmedText();
         setupBatteryText();
+    }
+
+    private void updateUIOnDeviceConnect() {
+        mConnectionHeader.setText(R.string.bike_connected);
+        mArmButton.setVisibility(View.VISIBLE);
+        mArmButton.setChecked(mPreferences.getInt("isArmed", 0) == 1);
+        mArmedText.setVisibility(View.GONE);
+    }
+
+    private void updateUIOnDeviceDisconnect() {
+        mConnectionHeader.setText(R.string.bike_disconnected);
+        mArmButton.setVisibility(View.GONE);
+        mArmedText.setVisibility(View.VISIBLE);
     }
 
     private void setupBatteryText() {
