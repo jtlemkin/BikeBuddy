@@ -20,17 +20,18 @@ import android.widget.ToggleButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Objects;
 
 /*
    TASKS:
    1. Implement bluetooth capabilities
     e. Bluetooth connections in background
     f. Start bluetooth service with jobscheduler
-   2. Make UI Responsive
-    a. Button should change color, text, and lock image when pressed
-   3. Change map annotation to be white and contain bike emoji
+   2. Change map annotation to be white and contain bike emoji
  */
 
 
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapView mMapView;
     private TextView mConnectionHeader;
     private TextView mArmedText;
+    private TextView mBatteryText;
     private ToggleButton mArmButton;
     private SharedPreferences mPreferences;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -71,11 +73,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Objects.requireNonNull(this.getSupportActionBar()).hide();
 
         setupMapView(savedInstanceState);
+        setupArmButton();
+        mPreferences = getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        setupBluetooth();
+        mConnectionHeader = findViewById(R.id.connectionHeader);
+        setupArmedText();
+        setupBatteryText();
+    }
 
-        this.getSupportActionBar().hide();
+    private void setupBatteryText() {
+        mBatteryText = findViewById(R.id.batteryText);
+    }
 
+    private void setupArmedText() {
+        mArmedText = findViewById(R.id.armedText);
+
+        if (mPreferences.getInt("isArmed", 0) == 0) {
+            mArmedText.setText(R.string.alarm_active);
+        } else {
+            mArmedText.setText(R.string.alarm_inactive);
+        }
+    }
+
+    private void setupBluetooth() {
+        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        assert bluetoothManager != null;
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+
+        // Ensures Bluetooth is available on the device and it is enabled. If not,
+        // displays a dialog requesting user permission to enable Bluetooth.
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            Intent intent = new Intent(this, BluetoothLeService.class);
+            startService(intent);
+        }
+    }
+
+    private void setupArmButton() {
         mArmButton = findViewById(R.id.armButton);
         mArmButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -93,31 +132,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-
-        mPreferences = getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        assert bluetoothManager != null;
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-
-        mConnectionHeader = findViewById(R.id.connectionHeader);
-        mArmedText = findViewById(R.id.armedText);
-
-        if (mPreferences.getInt("isArmed", 0) == 0) {
-            mArmedText.setText(R.string.alarm_active);
-        } else {
-            mArmedText.setText(R.string.alarm_inactive);
-        }
-
-        // Ensures Bluetooth is available on the device and it is enabled. If not,
-        // displays a dialog requesting user permission to enable Bluetooth.
-        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            Intent intent = new Intent(this, BluetoothLeService.class);
-            startService(intent);
-        }
     }
 
     private void setupMapView(Bundle savedInstanceState) {
@@ -169,7 +183,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         double latitude = Double.longBitsToDouble(mPreferences.getLong("latitude", 0));
         double longitude = Double.longBitsToDouble(mPreferences.getLong("longitude", 0));
-        map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Marker"));
+
+        //IconGenerator icg = new IconGenerator(this);
+
+        /*map.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title("Last Seen Bike Location")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).);*/
     }
 
     @Override

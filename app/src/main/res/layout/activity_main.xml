@@ -13,6 +13,15 @@
         android:layout_height="100dp"
         android:layout_weight="3" />
 
+    <TextView
+        android:id="@+id/batteryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/battery_life"
+        android:textAlignment="textEnd"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textSize="18sp" />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
