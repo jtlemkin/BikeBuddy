@@ -3,7 +3,6 @@ package com.example.bikebuddy;
 import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -20,9 +19,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.ParcelUuid;
 import android.util.Log;
 
@@ -34,15 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
-
-import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGatt bluetoothGatt;
-    private BluetoothGattCharacteristic characteristic;
+    private BluetoothGattCharacteristic alarmCharacteristic;
+    private BluetoothGattCharacteristic batteryLifeCharacteristic;
     private BluetoothLeScanner bluetoothLeScanner;
     private boolean mScanning;
     private int connectionState;
@@ -66,20 +61,25 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_DATA_AVAILABLE =
             "com.example.bikebuddy.ACTION_DATA_AVAILABLE";
 
-    public final static ParcelUuid alarmUUID = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
+    public final static ParcelUuid deviceUUID = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
+    public final static ParcelUuid alarmUUID = ParcelUuid.fromString("19b10001-e8f2-537e-4f6c-d104768a1214");
+    public final static ParcelUuid batteryLifeUUID = ParcelUuid.fromString("19b10002-e8f2-537e-4f6c-d104768a1214");
 
     private final BroadcastReceiver shouldWriteReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (MainActivity.SHOULD_TOGGLE_ALARM.equals(action)) {
-                assert characteristic != null;
                 int isArmed = intent.getIntExtra("isArmed", -1);
-                assert isArmed != -1;
-                characteristic.setValue(isArmed, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+                writeToAlarmCharacteristic(isArmed);
             }
         }
     };
+
+    private void writeToAlarmCharacteristic(int isArmed) {
+        assert alarmCharacteristic != null && isArmed != -1;
+        alarmCharacteristic.setValue(isArmed, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+    }
 
     @Override
     public void onCreate() {
@@ -114,19 +114,29 @@ public class BluetoothLeService extends Service {
             }, SCAN_PERIOD);
 
             mScanning = true;
-            List<ScanFilter> filters = new ArrayList<>();
-            //Use this to maybe better filter devices
-            ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(alarmUUID).build();
-            filters.add(scanFilter);
-            //This can also maybe be better
-            ScanSettings scanSettings = new ScanSettings.Builder()
-                    .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
-                    .build();
+            List<ScanFilter> filters = configureScanFilters();
+            ScanSettings scanSettings = configureScanSettings();
             bluetoothLeScanner.startScan(filters, scanSettings, leScanCallback);
         } else {
             mScanning = false;
             bluetoothLeScanner.startScan(leScanCallback);
         }
+    }
+
+    List<ScanFilter> configureScanFilters() {
+        List<ScanFilter> filters = new ArrayList<>();
+        //Use this to maybe better filter devices
+        ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(deviceUUID).build();
+        filters.add(scanFilter);
+
+        return filters;
+    }
+
+    ScanSettings configureScanSettings() {
+        //This can also maybe be better
+        return new ScanSettings.Builder()
+                .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+                .build();
     }
 
     private final ScanCallback leScanCallback = new ScanCallback() {
@@ -146,36 +156,21 @@ public class BluetoothLeService extends Service {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 connectionState = STATE_CONNECTED;
-                broadcastUpdate(intentAction);
                 Log.i(TAG, "Connected to GATT Server");
                 Log.i(TAG, "Attempting to start service discovery:"
                         + bluetoothGatt.discoverServices());
+                broadcastUpdate(intentAction);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 connectionState = STATE_DISCONNECTED;
-                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                double longitude = location.getLongitude();
-                                double latitude = location.getLatitude();
-
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putLong("longitude", Double.doubleToRawLongBits(longitude));
-                                editor.putLong("latitude", Double.doubleToRawLongBits(latitude));
-                                editor.apply();
-                            }
-                        }
-                    });
-                }
-                Log.i(TAG, "Disconnected from GATT server");
+                updateLocationPreference();
+                updateBatteryLifePreference();
                 broadcastUpdate(intentAction);
             }
 
             super.onConnectionStateChange(gatt, status, newState);
         }
+
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
@@ -190,29 +185,59 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-
-                int isArmed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, -1);
-                assert isArmed != -1;
-
-                if (isArmed == 0 || isArmed == 1) {
-                    editor.putInt("isArmed", isArmed);
-                    editor.apply();
+                if (characteristic.getUuid() == alarmUUID.getUuid()) {
+                    alarmCharacteristic = characteristic;
+                    updateArmingPreference();
+                } else if (characteristic.getUuid() == batteryLifeUUID.getUuid()) {
+                    batteryLifeCharacteristic = characteristic;
+                    updateBatteryLifePreference();
                 }
             }
         }
     };
 
-    private void broadcastUpdate(final String action) {
-        final Intent intent = new Intent(action);
-        sendBroadcast(intent);
+    private void updateBatteryLifePreference() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        int batteryLife = batteryLifeCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        editor.putInt("batteryLife", batteryLife);
+        editor.apply();
     }
 
-    private void broadcastUpdate(final String action,
-                                final BluetoothGattCharacteristic characteristic) {
-        final Intent intent = new Intent(action);
+    private void updateArmingPreference() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        int isArmed = alarmCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        assert isArmed != -1;
+
+        if (isArmed == 0 || isArmed == 1) {
+            editor.putInt("isArmed", isArmed);
+            editor.apply();
+        }
+    }
+
+    private void updateLocationPreference() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        double longitude = location.getLongitude();
+                        double latitude = location.getLatitude();
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putLong("longitude", Double.doubleToRawLongBits(longitude));
+                        editor.putLong("latitude", Double.doubleToRawLongBits(latitude));
+                        editor.apply();
+                    }
+                }
+            });
+        }
+    }
+
+    private void broadcastUpdate(final String action) {
+        final Intent intent = new Intent(action);
         sendBroadcast(intent);
     }
 

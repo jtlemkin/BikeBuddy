@@ -77,7 +77,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupBluetooth();
         mConnectionHeader = findViewById(R.id.connectionHeader);
         setupArmedText();
-        setupBatteryText();
+        mBatteryText = findViewById(R.id.batteryText);
+        updateBatteryText();
     }
 
     private void updateUIOnDeviceConnect() {
@@ -91,10 +92,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mConnectionHeader.setText(R.string.bike_disconnected);
         mArmButton.setVisibility(View.GONE);
         mArmedText.setVisibility(View.VISIBLE);
+        updateBatteryText();
     }
 
-    private void setupBatteryText() {
-        mBatteryText = findViewById(R.id.batteryText);
+    private void updateBatteryText() {
         int savedPercentage = mPreferences.getInt("batteryLife", -1);
         String percentageText;
 
