@@ -206,11 +206,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double longitude = Double.longBitsToDouble(mPreferences.getLong("longitude", 0));
 
         //IconGenerator icg = new IconGenerator(this);
-
-        /*map.addMarker(new MarkerOptions()
+        map.addMarker(new MarkerOptions()
                 .position(new LatLng(latitude, longitude))
-                .title("Last Seen Bike Location")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).);*/
+                .title("Last Seen Bike Location"));
+                //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).);
     }
 
     @Override
