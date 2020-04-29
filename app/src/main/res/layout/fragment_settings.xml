@@ -6,6 +6,17 @@
     android:orientation="vertical"
     tools:context=".Settings">
 
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ic_arrow_back_black_24dp"
+        android:minWidth="0dip"
+        android:minHeight="0dip"
+        android:textColorHint="#00FFFFFF" />
+
     <TextView
         android:id="@+id/settingsTitle"
         android:layout_width="match_parent"
