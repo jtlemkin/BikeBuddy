@@ -13,11 +13,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -97,6 +99,17 @@ public class Main extends Fragment implements OnMapReadyCallback {
         setupArmedText();
         mBatteryText = activity.findViewById(R.id.batteryText);
         updateBatteryText();
+        enableNavigationToSettings();
+    }
+
+    private void enableNavigationToSettings() {
+        Button settingsButton = activity.findViewById(R.id.settings_button);
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Navigation.findNavController(view).navigate(R.id.action_main_to_settings);
+            }
+        });
     }
 
     private void updateUIOnDeviceConnect() {
