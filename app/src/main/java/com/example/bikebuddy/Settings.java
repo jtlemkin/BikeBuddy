@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -50,7 +51,11 @@ public class Settings extends Fragment {
         View.OnClickListener passwordClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("TAG", "Click!");
+                CharSequence text = "ENTER PASSWORD CONFIGURATION INSTRUCTIONS HERE";
+                int duration = 4 * Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         };
 

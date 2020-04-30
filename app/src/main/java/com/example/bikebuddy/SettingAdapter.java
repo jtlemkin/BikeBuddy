@@ -17,11 +17,17 @@ public class SettingAdapter extends RecyclerView.Adapter<SettingAdapter.ViewHold
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mImageView;
         TextView mTextView;
+        View mView;
 
         ViewHolder(View settingView) {
             super(settingView);
+            mView = settingView;
             mImageView = settingView.findViewById(R.id.imageView);
             mTextView = settingView.findViewById(R.id.textView);
+        }
+
+        void setOnClickListener(View.OnClickListener onClickListener) {
+            mView.setOnClickListener(onClickListener);
         }
     }
 
@@ -42,6 +48,7 @@ public class SettingAdapter extends RecyclerView.Adapter<SettingAdapter.ViewHold
 
         holder.mImageView.setImageResource(currentItem.getImageResource());
         holder.mTextView.setText(currentItem.getText());
+        holder.setOnClickListener(currentItem.getmOnClickListener());
     }
 
     @Override

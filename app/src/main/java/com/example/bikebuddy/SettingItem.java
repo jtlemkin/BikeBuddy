@@ -20,4 +20,8 @@ class SettingItem {
     String getText() {
         return mText;
     }
+
+    View.OnClickListener getmOnClickListener() {
+        return mOnClickListener;
+    }
 }
