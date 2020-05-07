@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -16,6 +17,7 @@ import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
@@ -43,6 +46,7 @@ public class BluetoothLeService extends Service {
     private int connectionState;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SharedPreferences sharedPreferences;
+    private int armed = -1;
 
 
     // 10 second scan period
@@ -70,15 +74,52 @@ public class BluetoothLeService extends Service {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (MainActivity.SHOULD_TOGGLE_ALARM.equals(action)) {
-                int isArmed = intent.getIntExtra("isArmed", -1);
+
+                if (armed == -1 || armed == 0) {
+                    armed = 1;
+                } else if (armed == 1) {
+                    armed = 0;
+                }
+
+                int isArmed = intent.getIntExtra("isArmed", armed);
                 writeToAlarmCharacteristic(isArmed);
             }
         }
     };
 
+    private void registerMyReceiver() {
+        try {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(MainActivity.SHOULD_TOGGLE_ALARM);
+            registerReceiver(shouldWriteReceiver, intentFilter);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+    }
+
     private void writeToAlarmCharacteristic(int isArmed) {
-        assert alarmCharacteristic != null && isArmed != -1;
-        alarmCharacteristic.setValue(isArmed, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        if ((alarmCharacteristic != null) && (isArmed != -1)) {
+            alarmCharacteristic.setValue(isArmed, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+            boolean status = bluetoothGatt.writeCharacteristic(alarmCharacteristic);
+        } else {
+            if (isArmed == -1){
+                Log.d(TAG, "Its not armed");
+            } else {
+                Log.d(TAG, "Characteristic is null");
+            }
+        }
+    }
+
+    private boolean readCharacteristic(BluetoothGattCharacteristic characteristic) {
+
+        if (bluetoothGatt != null) {
+            return bluetoothGatt.readCharacteristic(characteristic);
+
+        }
+        return false;
     }
 
     @Override
@@ -96,6 +137,7 @@ public class BluetoothLeService extends Service {
         bluetoothAdapter = bluetoothManager.getAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
+        registerMyReceiver();
         scanLeDevice(true);
 
         return super.onStartCommand(intent, flags, startId);
@@ -128,15 +170,12 @@ public class BluetoothLeService extends Service {
         //Use this to maybe better filter devices
         ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(deviceUUID).build();
         filters.add(scanFilter);
-
         return filters;
     }
 
     ScanSettings configureScanSettings() {
         //This can also maybe be better
-        return new ScanSettings.Builder()
-                .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
-                .build();
+        return new ScanSettings.Builder().build();
     }
 
     private final ScanCallback leScanCallback = new ScanCallback() {
@@ -146,6 +185,7 @@ public class BluetoothLeService extends Service {
                 bluetoothGatt = result.getDevice().connectGatt(getApplicationContext(),
                         false, gattCallback);
             }
+
         }
     };
 
@@ -153,6 +193,7 @@ public class BluetoothLeService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
+
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 connectionState = STATE_CONNECTED;
@@ -163,7 +204,7 @@ public class BluetoothLeService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 connectionState = STATE_DISCONNECTED;
-                updateLocationPreference();
+                //updateLocationPreference();
                 updateBatteryLifePreference();
                 broadcastUpdate(intentAction);
             }
@@ -175,7 +216,11 @@ public class BluetoothLeService extends Service {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                BluetoothGattService service = gatt.getService(deviceUUID.getUuid());
+                alarmCharacteristic = service.getCharacteristics().get(0);
+                batteryLifeCharacteristic = service.getCharacteristics().get(1);
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+                //onCharacteristicRead(bluetoothGatt, batteryLifeCharacteristic, 0);
             } else {
                 Log.w(TAG, "onServiceDiscovered received: " + status);
             }
@@ -185,30 +230,38 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (characteristic.getUuid() == alarmUUID.getUuid()) {
-                    alarmCharacteristic = characteristic;
-                    updateArmingPreference();
-                } else if (characteristic.getUuid() == batteryLifeUUID.getUuid()) {
-                    batteryLifeCharacteristic = characteristic;
-                    updateBatteryLifePreference();
-                }
+                updateBatteryLifePreference();
             }
         }
     };
 
     private void updateBatteryLifePreference() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        int batteryLife = -1;
 
-        int batteryLife = batteryLifeCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        readCharacteristic(batteryLifeCharacteristic);
+        if (batteryLifeCharacteristic == null) {
+            Log.d(TAG, "Characteristic is null");
+        }
+
+        final byte [] data = batteryLifeCharacteristic.getValue();
+        if (data == null) {
+            Log.d(TAG, "fail");
+            return;
+        } else {
+            batteryLife = batteryLifeCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+            Log.d(TAG, "BL = " + batteryLife);
+        }
+
         editor.putInt("batteryLife", batteryLife);
         editor.apply();
+        broadcastUpdate("batteryLife");
     }
 
     private void updateArmingPreference() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         int isArmed = alarmCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
-        assert isArmed != -1;
 
         if (isArmed == 0 || isArmed == 1) {
             editor.putInt("isArmed", isArmed);

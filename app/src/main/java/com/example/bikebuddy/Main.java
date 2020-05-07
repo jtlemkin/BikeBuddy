@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -77,6 +78,21 @@ public class Main extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
+    private void registerMyReceiver() {
+        try {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+            intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+            getActivity().registerReceiver(gattUpdateReceiver, intentFilter);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -94,6 +110,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
         setupMapView(savedInstanceState);
         setupArmButton();
         mPreferences = context.getSharedPreferences(MainActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        registerMyReceiver();
         setupBluetooth();
         mConnectionHeader = activity.findViewById(R.id.connectionHeader);
         setupArmedText();
@@ -130,13 +147,14 @@ public class Main extends Fragment implements OnMapReadyCallback {
         int savedPercentage = mPreferences.getInt("batteryLife", -1);
         String percentageText;
 
+        Log.d(TAG, "Percentage: " + savedPercentage);
         if (savedPercentage == -1) {
-            percentageText = "Undefined";
+            percentageText = "-1%";
         } else {
             percentageText = Integer.toString(savedPercentage);
         }
 
-        String newLabel = getString(R.string.battery_life, percentageText);
+        String newLabel = "Device Life: " + percentageText + "%";
         mBatteryText.setText(newLabel);
     }
 
@@ -161,8 +179,8 @@ public class Main extends Fragment implements OnMapReadyCallback {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
-            Intent intent = new Intent(context, BluetoothLeService.class);
-            context.startService(intent);
+            Intent intent = new Intent(getActivity(), BluetoothLeService.class);
+            getActivity().startService(intent);
         }
     }
 
@@ -181,7 +199,6 @@ public class Main extends Fragment implements OnMapReadyCallback {
                     buttonView.setBackgroundColor(Color.RED);
                     buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline_black_24dp, 0, 0, 0);
                 }
-
             }
         });
     }
@@ -250,6 +267,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
     public void onDestroy() {
         mMapView.onDestroy();
         super.onDestroy();
+        getActivity().unregisterReceiver(gattUpdateReceiver);
     }
 
     @Override
