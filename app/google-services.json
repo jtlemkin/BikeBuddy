@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "443181377267",
+    "firebase_url": "https://bikebuddy-fcd09.firebaseio.com",
+    "project_id": "bikebuddy-fcd09",
+    "storage_bucket": "bikebuddy-fcd09.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443181377267:android:09ce4f57a87b3588ecf986",
+        "android_client_info": {
+          "package_name": "com.example.bikebuddy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "443181377267-c7sgppi1g1lo8vte75ko4l82cb98fvga.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bikebuddy",
+            "certificate_hash": "f41fca91640ca70df1c749d71fd4d91f2455c0f2"
+          }
+        },
+        {
+          "client_id": "443181377267-bq3f2prnl9ft4i9ajqjdsd2jv08pfmee.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4fkKQ5duzJdshAJG_ReuxsVkC4TBjW4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "443181377267-bq3f2prnl9ft4i9ajqjdsd2jv08pfmee.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "443181377267-f2oo51ke8aelagbs7tucrcc76u00h2k8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "jtlemkin-ucdavis.edu.IoBike"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -51,15 +51,34 @@ public class Settings extends Fragment {
         View.OnClickListener passwordClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CharSequence text = "ENTER PASSWORD CONFIGURATION INSTRUCTIONS HERE";
-                int duration = 4 * Toast.LENGTH_LONG;
-
-                Toast toast = Toast.makeText(context, text, duration);
+                CharSequence text = "ENTER 5 MOVEMENTS TO CONFIGURE PASSWORD";
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
                 toast.show();
             }
         };
 
-        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Set password", passwordClickListener));
+        View.OnClickListener registerClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CharSequence text = "REGISTER NEW BIKE";
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        };
+
+        View.OnClickListener reportClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CharSequence text = "REPORT STOLEN BIKE";
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        };
+
+        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Set Password", passwordClickListener));
+        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Register New Device", registerClickListener));
+        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Report Stolen Bike", reportClickListener));
+
 
         mRecyclerView = activity.findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);

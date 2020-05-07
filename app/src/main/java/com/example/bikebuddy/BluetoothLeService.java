@@ -204,8 +204,8 @@ public class BluetoothLeService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 connectionState = STATE_DISCONNECTED;
-                //updateLocationPreference();
                 updateBatteryLifePreference();
+                updateLocationPreference();
                 broadcastUpdate(intentAction);
             }
 
@@ -231,6 +231,7 @@ public class BluetoothLeService extends Service {
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 updateBatteryLifePreference();
+                updateLocationPreference();
             }
         }
     };
@@ -270,12 +271,16 @@ public class BluetoothLeService extends Service {
     }
 
     private void updateLocationPreference() {
+        Log.d(TAG, "here1");
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "here2");
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
+                    Log.d(TAG, "here3");
                     if (location != null) {
+                        Log.d(TAG, "here4");
                         double longitude = location.getLongitude();
                         double latitude = location.getLatitude();
 
@@ -283,6 +288,7 @@ public class BluetoothLeService extends Service {
                         editor.putLong("longitude", Double.doubleToRawLongBits(longitude));
                         editor.putLong("latitude", Double.doubleToRawLongBits(latitude));
                         editor.apply();
+                        Log.d(TAG, "here5");
                     }
                 }
             });

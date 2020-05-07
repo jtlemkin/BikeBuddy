@@ -30,6 +30,10 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import static com.example.bikebuddy.R.id.settings_button;
 
 
 /*
@@ -107,6 +111,11 @@ public class Main extends Fragment implements OnMapReadyCallback {
         activity = getView();
         context = getContext();
 
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+        myRef.setValue("19b10000-e8f2-537e-4f6c-d104768a1214");
+
         setupMapView(savedInstanceState);
         setupArmButton();
         mPreferences = context.getSharedPreferences(MainActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
@@ -120,7 +129,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
     }
 
     private void enableNavigationToSettings() {
-        Button settingsButton = activity.findViewById(R.id.settings_button);
+        Button settingsButton = activity.findViewById(settings_button);
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -149,7 +158,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
 
         Log.d(TAG, "Percentage: " + savedPercentage);
         if (savedPercentage == -1) {
-            percentageText = "-1%";
+            percentageText = "-1";
         } else {
             percentageText = Integer.toString(savedPercentage);
         }
