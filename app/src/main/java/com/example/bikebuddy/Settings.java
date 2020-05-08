@@ -76,8 +76,8 @@ public class Settings extends Fragment {
         };
 
         settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Set Password", passwordClickListener));
-        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Register New Device", registerClickListener));
-        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Report Stolen Bike", reportClickListener));
+        settingList.add(new SettingItem(R.drawable.ic_directions_bike_black_24dp, "Register New Device", registerClickListener));
+        settingList.add(new SettingItem(R.drawable.ic_report_24dp, "Report Stolen Bike", reportClickListener));
 
 
         mRecyclerView = activity.findViewById(R.id.recyclerView);

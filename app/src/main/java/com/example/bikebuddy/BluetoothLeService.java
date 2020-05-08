@@ -46,7 +46,7 @@ public class BluetoothLeService extends Service {
     private int connectionState;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SharedPreferences sharedPreferences;
-    private int armed = -1;
+    private boolean arm = false;
 
 
     // 10 second scan period
@@ -75,12 +75,14 @@ public class BluetoothLeService extends Service {
             final String action = intent.getAction();
             if (MainActivity.SHOULD_TOGGLE_ALARM.equals(action)) {
 
-                if (armed == -1 || armed == 0) {
+                int armed = -1;
+                if (!arm) {
                     armed = 1;
-                } else if (armed == 1) {
+                    arm = true;
+                } else {
                     armed = 0;
+                    arm = false;
                 }
-
                 int isArmed = intent.getIntExtra("isArmed", armed);
                 writeToAlarmCharacteristic(isArmed);
             }
@@ -271,16 +273,12 @@ public class BluetoothLeService extends Service {
     }
 
     private void updateLocationPreference() {
-        Log.d(TAG, "here1");
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "here2");
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    Log.d(TAG, "here3");
                     if (location != null) {
-                        Log.d(TAG, "here4");
                         double longitude = location.getLongitude();
                         double latitude = location.getLatitude();
 
@@ -288,7 +286,6 @@ public class BluetoothLeService extends Service {
                         editor.putLong("longitude", Double.doubleToRawLongBits(longitude));
                         editor.putLong("latitude", Double.doubleToRawLongBits(latitude));
                         editor.apply();
-                        Log.d(TAG, "here5");
                     }
                 }
             });

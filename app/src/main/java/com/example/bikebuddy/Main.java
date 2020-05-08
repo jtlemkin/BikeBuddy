@@ -57,6 +57,9 @@ public class Main extends Fragment implements OnMapReadyCallback {
     private View activity;
     private Context context;
 
+    private boolean connection = false;
+    private boolean armed = false;
+
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int ARMING_UNKNOWN = -1;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -111,21 +114,24 @@ public class Main extends Fragment implements OnMapReadyCallback {
         activity = getView();
         context = getContext();
 
-
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("message");
         myRef.setValue("19b10000-e8f2-537e-4f6c-d104768a1214");
 
         setupMapView(savedInstanceState);
-        setupArmButton();
         mPreferences = context.getSharedPreferences(MainActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         registerMyReceiver();
         setupBluetooth();
         mConnectionHeader = activity.findViewById(R.id.connectionHeader);
         setupArmedText();
+        setupArmButton();
         mBatteryText = activity.findViewById(R.id.batteryText);
         updateBatteryText();
         enableNavigationToSettings();
+
+        if (connection) {
+            updateUIOnDeviceConnect();
+        }
     }
 
     private void enableNavigationToSettings() {
@@ -143,6 +149,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
         mArmButton.setVisibility(View.VISIBLE);
         mArmButton.setChecked(mPreferences.getInt("isArmed", 0) == 1);
         mArmedText.setVisibility(View.GONE);
+        connection = true;
     }
 
     private void updateUIOnDeviceDisconnect() {
@@ -150,6 +157,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
         mArmButton.setVisibility(View.GONE);
         mArmedText.setVisibility(View.VISIBLE);
         updateBatteryText();
+        connection = false;
     }
 
     private void updateBatteryText() {
@@ -197,16 +205,23 @@ public class Main extends Fragment implements OnMapReadyCallback {
         mArmButton = activity.findViewById(R.id.armButton);
         mArmButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Intent intent = new Intent(MainActivity.SHOULD_TOGGLE_ALARM);
-                intent.putExtra("isArmed", isChecked);
-                context.sendBroadcast(intent);
-
-                if (isChecked) {
+                if (armed && isChecked) {
                     buttonView.setBackgroundColor(Color.GRAY);
                     buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
                 } else {
-                    buttonView.setBackgroundColor(Color.RED);
-                    buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline_black_24dp, 0, 0, 0);
+                    Intent intent = new Intent(MainActivity.SHOULD_TOGGLE_ALARM);
+                    intent.putExtra("isArmed", isChecked);
+                    context.sendBroadcast(intent);
+
+                    if (isChecked) {
+                        buttonView.setBackgroundColor(Color.GRAY);
+                        buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
+                        armed = true;
+                    } else {
+                        buttonView.setBackgroundColor(Color.RED);
+                        buttonView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline_black_24dp, 0, 0, 0);
+                        armed = false;
+                    }
                 }
             }
         });
