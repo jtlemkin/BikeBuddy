@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_settings_to_qr"
             app:destination="@id/qr" />
+        <action
+            android:id="@+id/action_settings_to_listBikes"
+            app:destination="@id/listBikes" />
     </fragment>
     <action
         android:id="@+id/settings_to_reg"
@@ -31,4 +34,9 @@
         android:name="com.example.bikebuddy.qr"
         android:label="activity_qr"
         tools:layout="@layout/activity_qr" />
+    <fragment
+        android:id="@+id/listBikes"
+        android:name="com.example.bikebuddy.listBikes"
+        android:label="fragment_list_bikes"
+        tools:layout="@layout/fragment_list_bikes" />
 </navigation>

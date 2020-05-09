@@ -10,6 +10,7 @@ public class MainActivity extends AppCompatActivity {
     private static int counter = 0;
 
     public final static String SHOULD_TOGGLE_ALARM = "com.example.bikebuddy.SHOULD_TOGGLE_ALARM";
+    public final static String CONFIG_PASSWORD = "com.example.bikebuddy.CONFIG_PASSWORD";
     public final static String PREFERENCE_FILE_KEY = "com.example.bikebuddy.PREFERENCE_FILE_KEY";
 
     @Override

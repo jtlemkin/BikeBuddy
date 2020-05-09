@@ -1,16 +1,20 @@
 package com.example.bikebuddy;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.Navigation;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -20,7 +24,6 @@ import static com.example.bikebuddy.MainActivity.getCounter;
 
 
 public class qr extends AppCompatActivity {
-
     private String dataRead = "";
     private TextView box;
 
@@ -31,6 +34,7 @@ public class qr extends AppCompatActivity {
 
         box = findViewById(R.id.textView2);
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PackageManager.PERMISSION_GRANTED);
+        goBack();
     }
 
     public void scanButton(View view) {
@@ -62,5 +66,15 @@ public class qr extends AppCompatActivity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void goBack() {
+        Button backButton = findViewById(R.id.back_button2);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 }

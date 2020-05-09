@@ -16,4 +16,6 @@
     <string name="results_appear_here">Results Appear Here</string>
     <string name="scan">Scan</string>
     <string name="register_this_device">Register This Device</string>
+    <string name="config_pass">Button</string>
+    <string name="bikes">Bikes</string>
 </resources>

@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -34,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
+import static com.example.bikebuddy.R.id.config_pass;
 import static com.example.bikebuddy.R.id.settings_button;
 
 
@@ -129,6 +131,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
         mBatteryText = activity.findViewById(R.id.batteryText);
         updateBatteryText();
         enableNavigationToSettings();
+        configurePassword();
 
         if (connection) {
             updateUIOnDeviceConnect();
@@ -141,6 +144,22 @@ public class Main extends Fragment implements OnMapReadyCallback {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Navigation.findNavController(view).navigate(R.id.action_main_to_settings);
+            }
+        });
+    }
+
+    private void configurePassword() {
+        Button passButton = activity.findViewById(config_pass);
+
+        passButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.CONFIG_PASSWORD);
+                intent.putExtra("configPass", 2);
+                context.sendBroadcast(intent);
+
+                CharSequence text = "ENTER 5 MOVEMENTS TO CONFIGURE PASSWORD";
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
             }
         });
     }

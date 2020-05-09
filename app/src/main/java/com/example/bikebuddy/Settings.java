@@ -49,20 +49,32 @@ public class Settings extends Fragment {
         enableNavigationToMain();
         ArrayList<SettingItem> settingList = new ArrayList<>();
 
-        View.OnClickListener passwordClickListener = new View.OnClickListener() {
+        /*View.OnClickListener passwordClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 CharSequence text = "ENTER 5 MOVEMENTS TO CONFIGURE PASSWORD";
+
+                Intent intent = new Intent(MainActivity.CONFIG_PASSWORD);
+                intent.putExtra("configPass", 2);
+                context.sendBroadcast(intent);
+
                 Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
                 toast.show();
             }
-        };
+        };*/
 
         View.OnClickListener registerClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CharSequence text = "REGISTER NEW BIKE";
+                //CharSequence text = "REGISTER NEW BIKE";
                 Navigation.findNavController(view).navigate(R.id.action_settings_to_qr);
+            }
+        };
+
+        View.OnClickListener listClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Navigation.findNavController(view).navigate(R.id.action_settings_to_listBikes);
             }
         };
 
@@ -75,8 +87,9 @@ public class Settings extends Fragment {
             }
         };
 
-        settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Set Password", passwordClickListener));
+        //settingList.add(new SettingItem(R.drawable.ic_motion_24dp, "Set Password", passwordClickListener));
         settingList.add(new SettingItem(R.drawable.ic_directions_bike_black_24dp, "Register New Device", registerClickListener));
+        settingList.add(new SettingItem(R.drawable.ic_menu_black_24dp, "My Bikes", listClickListener));
         settingList.add(new SettingItem(R.drawable.ic_report_24dp, "Report Stolen Bike", reportClickListener));
 
 

@@ -48,7 +48,6 @@ public class BluetoothLeService extends Service {
     private SharedPreferences sharedPreferences;
     private boolean arm = false;
 
-
     // 10 second scan period
     private static final long SCAN_PERIOD = 10000;
 
@@ -66,8 +65,9 @@ public class BluetoothLeService extends Service {
             "com.example.bikebuddy.ACTION_DATA_AVAILABLE";
 
     public final static ParcelUuid deviceUUID = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
-    public final static ParcelUuid alarmUUID = ParcelUuid.fromString("19b10001-e8f2-537e-4f6c-d104768a1214");
-    public final static ParcelUuid batteryLifeUUID = ParcelUuid.fromString("19b10002-e8f2-537e-4f6c-d104768a1214");
+    //public final static ParcelUuid deviceUUID = ParcelUuid.fromString("00000000-0000-0000-0000-000000000000");
+    //public final static ParcelUuid alarmUUID = ParcelUuid.fromString("19b10001-e8f2-537e-4f6c-d104768a1214");
+    //public final static ParcelUuid batteryLifeUUID = ParcelUuid.fromString("19b10002-e8f2-537e-4f6c-d104768a1214");
 
     private final BroadcastReceiver shouldWriteReceiver = new BroadcastReceiver() {
         @Override
@@ -85,7 +85,12 @@ public class BluetoothLeService extends Service {
                 }
                 int isArmed = intent.getIntExtra("isArmed", armed);
                 writeToAlarmCharacteristic(isArmed);
+            } else if (MainActivity.CONFIG_PASSWORD.equals(action)) {
+                int config = intent.getIntExtra("configPass", 2);
+                writeToAlarmCharacteristic(config);
             }
+
+
         }
     };
 
@@ -93,6 +98,7 @@ public class BluetoothLeService extends Service {
         try {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(MainActivity.SHOULD_TOGGLE_ALARM);
+            intentFilter.addAction(MainActivity.CONFIG_PASSWORD);
             registerReceiver(shouldWriteReceiver, intentFilter);
         }
         catch (Exception ex)
@@ -222,7 +228,6 @@ public class BluetoothLeService extends Service {
                 alarmCharacteristic = service.getCharacteristics().get(0);
                 batteryLifeCharacteristic = service.getCharacteristics().get(1);
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-                //onCharacteristicRead(bluetoothGatt, batteryLifeCharacteristic, 0);
             } else {
                 Log.w(TAG, "onServiceDiscovered received: " + status);
             }
