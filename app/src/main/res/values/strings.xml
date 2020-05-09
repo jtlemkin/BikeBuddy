@@ -15,4 +15,5 @@
     <string name="arrows">Arrows</string>
     <string name="results_appear_here">Results Appear Here</string>
     <string name="scan">Scan</string>
+    <string name="register_this_device">Register This Device</string>
 </resources>

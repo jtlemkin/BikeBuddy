@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
 import static com.example.bikebuddy.R.id.settings_button;
 
 

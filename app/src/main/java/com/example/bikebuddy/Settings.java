@@ -62,8 +62,6 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View view) {
                 CharSequence text = "REGISTER NEW BIKE";
-                //Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-                //toast.show();
                 Navigation.findNavController(view).navigate(R.id.action_settings_to_qr);
             }
         };
