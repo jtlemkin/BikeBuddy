@@ -17,5 +17,18 @@
         android:id="@+id/settings"
         android:name="com.example.bikebuddy.Settings"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settings_to_qr"
+            app:destination="@id/qr" />
+    </fragment>
+    <action
+        android:id="@+id/settings_to_reg"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
+    <activity
+        android:id="@+id/qr"
+        android:name="com.example.bikebuddy.qr"
+        android:label="activity_qr"
+        tools:layout="@layout/activity_qr" />
 </navigation>

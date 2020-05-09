@@ -8,7 +8,7 @@ android {
     buildToolsVersion "29.0.0"
     defaultConfig {
         applicationId "com.example.bikebuddy"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -41,4 +41,5 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-database:19.3.0'
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.journeyapps:zxing-android-embedded:4.0.2'
 }

@@ -13,4 +13,6 @@
     <string name="settingsText">Settings</string>
     <string name="set_password">Set password</string>
     <string name="arrows">Arrows</string>
+    <string name="results_appear_here">Results Appear Here</string>
+    <string name="scan">Scan</string>
 </resources>

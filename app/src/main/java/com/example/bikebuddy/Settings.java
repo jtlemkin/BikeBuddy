@@ -1,6 +1,7 @@
 package com.example.bikebuddy;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -61,8 +62,9 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View view) {
                 CharSequence text = "REGISTER NEW BIKE";
-                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-                toast.show();
+                //Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                //toast.show();
+                Navigation.findNavController(view).navigate(R.id.action_settings_to_qr);
             }
         };
 
