@@ -10,6 +10,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +23,35 @@ import java.util.ArrayList;
 
 import static com.example.bikebuddy.MainActivity.getCounter;
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
+import static com.example.bikebuddy.MainActivity.setCurrDevice;
+
+class MyOnClickListener implements View.OnClickListener {
+    private Context context;
+    private String selectedBike;
+
+    public MyOnClickListener(String sb, Context c) {
+        this.selectedBike = sb;
+        this.context = c;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        setCurrDevice(selectedBike);
+        Log.d(Main.class.getSimpleName(), selectedBike + " SELECTED");
+        CharSequence text = selectedBike + " SELECTED";
+        Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+};
 
 public class listBikes extends Fragment {
     private View activity;
     private Context context;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     public listBikes() {
         // Required empty public constructor
@@ -50,7 +76,20 @@ public class listBikes extends Fragment {
         goBack();
 
         String[] bikes = getRegisteredDevices();
+        ArrayList<SettingItem> bikeList = new ArrayList<>();
 
+        for (int i = 0; i < getCounter(); i ++) {
+            MyOnClickListener bikeListener = new MyOnClickListener(bikes[i], context);
+            bikeList.add(new SettingItem(R.drawable.ic_directions_bike_black_24dp, bikes[i], bikeListener));
+        }
+
+        mRecyclerView = activity.findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(context);
+        mAdapter = new SettingAdapter(bikeList);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private void goBack() {

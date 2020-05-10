@@ -35,6 +35,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import static com.example.bikebuddy.MainActivity.getCurrDevice;
+
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
     private BluetoothAdapter bluetoothAdapter;
@@ -64,8 +66,8 @@ public class BluetoothLeService extends Service {
     public final static String ACTION_DATA_AVAILABLE =
             "com.example.bikebuddy.ACTION_DATA_AVAILABLE";
 
-    public final static ParcelUuid deviceUUID = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
-    //public final static ParcelUuid deviceUUID = ParcelUuid.fromString("00000000-0000-0000-0000-000000000000");
+    //public final static ParcelUuid deviceUUID = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
+    public static ParcelUuid deviceUUID = ParcelUuid.fromString("00000000-0000-0000-0000-000000000000");
     //public final static ParcelUuid alarmUUID = ParcelUuid.fromString("19b10001-e8f2-537e-4f6c-d104768a1214");
     //public final static ParcelUuid batteryLifeUUID = ParcelUuid.fromString("19b10002-e8f2-537e-4f6c-d104768a1214");
 
@@ -176,6 +178,7 @@ public class BluetoothLeService extends Service {
     List<ScanFilter> configureScanFilters() {
         List<ScanFilter> filters = new ArrayList<>();
         //Use this to maybe better filter devices
+        deviceUUID = getCurrDevice();
         ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(deviceUUID).build();
         filters.add(scanFilter);
         return filters;
