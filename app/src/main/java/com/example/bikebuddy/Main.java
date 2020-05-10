@@ -117,10 +117,6 @@ public class Main extends Fragment implements OnMapReadyCallback {
         activity = getView();
         context = getContext();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("19b10000-e8f2-537e-4f6c-d104768a1214");
-
         setupMapView(savedInstanceState);
         mPreferences = context.getSharedPreferences(MainActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         registerMyReceiver();

@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_settings_to_listBikes"
             app:destination="@id/listBikes" />
+        <action
+            android:id="@+id/action_settings_to_report"
+            app:destination="@id/report" />
     </fragment>
     <action
         android:id="@+id/settings_to_reg"
@@ -39,4 +42,9 @@
         android:name="com.example.bikebuddy.listBikes"
         android:label="fragment_list_bikes"
         tools:layout="@layout/fragment_list_bikes" />
+    <fragment
+        android:id="@+id/report"
+        android:name="com.example.bikebuddy.report"
+        android:label="fragment_report_list"
+        tools:layout="@layout/fragment_report_list" />
 </navigation>

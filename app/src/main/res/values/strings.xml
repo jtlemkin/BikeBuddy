@@ -18,4 +18,5 @@
     <string name="register_this_device">Register This Device</string>
     <string name="config_pass">Button</string>
     <string name="bikes">Bikes</string>
+    <string name="report_stolen">Report Stolen</string>
 </resources>

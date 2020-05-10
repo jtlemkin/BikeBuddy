@@ -46,8 +46,18 @@ public class qr extends AppCompatActivity {
         if (dataRead.equals("")) {
             return;
         } else {
-            //do some checks on the string
-            addDevice(dataRead);
+            boolean check = true;
+            for (int i = 0; i < dataRead.length(); i++) {
+                char c = dataRead.charAt(i);
+                if ((c != '-') && (!Character.isDigit(c)) && (!Character.isLetter(c))) {
+                    check = false;
+                    break;
+                }
+            }
+
+            if (check) {
+                addDevice(dataRead);
+            }
             finish();
         }
     }

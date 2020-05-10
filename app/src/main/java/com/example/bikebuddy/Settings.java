@@ -66,7 +66,6 @@ public class Settings extends Fragment {
         View.OnClickListener registerClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //CharSequence text = "REGISTER NEW BIKE";
                 Navigation.findNavController(view).navigate(R.id.action_settings_to_qr);
             }
         };
@@ -81,9 +80,7 @@ public class Settings extends Fragment {
         View.OnClickListener reportClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CharSequence text = "REPORT STOLEN BIKE";
-                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-                toast.show();
+                Navigation.findNavController(view).navigate(R.id.action_settings_to_report);
             }
         };
 
