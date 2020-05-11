@@ -8,6 +8,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static String [] stolenBikes = new String[100];
     private static String [] registeredDevices = new String[10];
     private static int counter = 0;
     private static ParcelUuid currDevice = ParcelUuid.fromString("00000000-0000-0000-0000-000000000000");
@@ -23,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < 10; i++) {
             registeredDevices[i] = "";
+        }
+        for (int i = 0; i < 100; i++) {
+            stolenBikes[i] = "";
         }
 
         setContentView(R.layout.activity_main);
@@ -52,5 +56,11 @@ public class MainActivity extends AppCompatActivity {
         registeredDevices[getCounter()] = id;
         incCounter();
         return;
+    }
+
+    public static String [] getStolenBikes() { return stolenBikes; }
+
+    public static void addStolenBike(int i, String s) {
+        stolenBikes[i] = s;
     }
 }

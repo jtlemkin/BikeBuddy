@@ -31,9 +31,13 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import static com.example.bikebuddy.MainActivity.addStolenBike;
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
 import static com.example.bikebuddy.R.id.config_pass;
 import static com.example.bikebuddy.R.id.settings_button;
@@ -117,6 +121,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
         activity = getView();
         context = getContext();
 
+        readDatabase();
         setupMapView(savedInstanceState);
         mPreferences = context.getSharedPreferences(MainActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         registerMyReceiver();
@@ -132,6 +137,34 @@ public class Main extends Fragment implements OnMapReadyCallback {
         if (connection) {
             updateUIOnDeviceConnect();
         }
+    }
+
+    private void readDatabase() {
+        // read all reported stolen bikes from database
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myID = database.getReference("Stolen Bike UUIDs");
+        ValueEventListener dbListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int i = 0;
+                for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                    String newUUID = snap.getValue(String.class);
+                    addStolenBike(i, newUUID);
+                    i++;
+                    Log.d(TAG, newUUID);
+                }
+                for (; i < 100; i++) {
+                    addStolenBike(i, "");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.d(TAG, "loadUUID:onCancelled", databaseError.toException());
+            }
+        };
+        myID.addValueEventListener(dbListener);
     }
 
     private void enableNavigationToSettings() {

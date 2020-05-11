@@ -42,11 +42,11 @@ class ReportListener implements View.OnClickListener {
     {
         //write to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("List of Reported Stolen Bikes");
+        //DatabaseReference myRef = database.getReference("message");
+        //myRef.setValue("List of Reported Stolen Bikes");
 
-        DatabaseReference myID = database.getReference(selectedBike);
-        myID.setValue(selectedBike);
+        DatabaseReference myID = database.getReference();
+        myID.child("Stolen Bike UUIDs").child(selectedBike).setValue(selectedBike);
 
         Log.d(Main.class.getSimpleName(), selectedBike + " SELECTED");
         CharSequence text = selectedBike + " REPORTED AS STOLEN";
