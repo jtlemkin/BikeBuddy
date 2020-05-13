@@ -274,6 +274,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
                         armed = false;
                     }
                 }
+                updateBatteryText();
             }
         });
     }

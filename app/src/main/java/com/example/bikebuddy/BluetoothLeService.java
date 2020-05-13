@@ -88,6 +88,7 @@ public class BluetoothLeService extends Service {
                 }
                 int isArmed = intent.getIntExtra("isArmed", armed);
                 writeToAlarmCharacteristic(isArmed);
+                updateBatteryLifePreference();
             } else if (MainActivity.CONFIG_PASSWORD.equals(action)) {
                 int config = intent.getIntExtra("configPass", 2);
                 writeToAlarmCharacteristic(config);
@@ -231,7 +232,6 @@ public class BluetoothLeService extends Service {
                 BluetoothGattService service = gatt.getService(deviceUUID.getUuid());
                 alarmCharacteristic = service.getCharacteristics().get(0);
                 batteryLifeCharacteristic = service.getCharacteristics().get(1);
-                updateBatteryLifePreference();
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w(TAG, "onServiceDiscovered received: " + status);
@@ -262,6 +262,7 @@ public class BluetoothLeService extends Service {
             Log.d(TAG, "fail");
             return;
         } else {
+
             batteryLife = batteryLifeCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
             Log.d(TAG, "BL = " + batteryLife);
         }
