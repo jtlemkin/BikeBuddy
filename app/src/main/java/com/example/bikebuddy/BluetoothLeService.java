@@ -36,6 +36,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import static com.example.bikebuddy.MainActivity.getCurrDevice;
+import static com.example.bikebuddy.MainActivity.setBatteryLife;
 
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
@@ -230,6 +231,7 @@ public class BluetoothLeService extends Service {
                 BluetoothGattService service = gatt.getService(deviceUUID.getUuid());
                 alarmCharacteristic = service.getCharacteristics().get(0);
                 batteryLifeCharacteristic = service.getCharacteristics().get(1);
+                updateBatteryLifePreference();
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w(TAG, "onServiceDiscovered received: " + status);
@@ -247,7 +249,7 @@ public class BluetoothLeService extends Service {
     };
 
     private void updateBatteryLifePreference() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //SharedPreferences.Editor editor = sharedPreferences.edit();
         int batteryLife = -1;
 
         readCharacteristic(batteryLifeCharacteristic);
@@ -264,8 +266,9 @@ public class BluetoothLeService extends Service {
             Log.d(TAG, "BL = " + batteryLife);
         }
 
-        editor.putInt("batteryLife", batteryLife);
-        editor.apply();
+        //editor.putInt("batteryLife", batteryLife);
+        //editor.apply();
+        setBatteryLife(batteryLife);
         broadcastUpdate("batteryLife");
     }
 

@@ -38,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import static com.example.bikebuddy.MainActivity.addStolenBike;
+import static com.example.bikebuddy.MainActivity.getBatteryLife;
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
 import static com.example.bikebuddy.R.id.config_pass;
 import static com.example.bikebuddy.R.id.settings_button;
@@ -198,6 +199,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
         mArmButton.setVisibility(View.VISIBLE);
         mArmButton.setChecked(mPreferences.getInt("isArmed", 0) == 1);
         mArmedText.setVisibility(View.GONE);
+        updateBatteryText();
         connection = true;
     }
 
@@ -210,7 +212,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
     }
 
     private void updateBatteryText() {
-        int savedPercentage = mPreferences.getInt("batteryLife", -1);
+        int savedPercentage = getBatteryLife(); //mPreferences.getInt("batteryLife", -1);
         String percentageText;
 
         Log.d(TAG, "Percentage: " + savedPercentage);
