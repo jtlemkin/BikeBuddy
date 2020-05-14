@@ -88,7 +88,6 @@ public class BluetoothLeService extends Service {
                 }
                 int isArmed = intent.getIntExtra("isArmed", armed);
                 writeToAlarmCharacteristic(isArmed);
-                updateBatteryLifePreference();
             } else if (MainActivity.CONFIG_PASSWORD.equals(action)) {
                 int config = intent.getIntExtra("configPass", 2);
                 writeToAlarmCharacteristic(config);
@@ -210,8 +209,8 @@ public class BluetoothLeService extends Service {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 intentAction = ACTION_GATT_CONNECTED;
                 connectionState = STATE_CONNECTED;
-                Log.i(TAG, "Connected to GATT Server");
-                Log.i(TAG, "Attempting to start service discovery:"
+                Log.d(TAG, "Connected to GATT Server");
+                Log.d(TAG, "Attempting to start service discovery:"
                         + bluetoothGatt.discoverServices());
                 broadcastUpdate(intentAction);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -233,6 +232,7 @@ public class BluetoothLeService extends Service {
                 alarmCharacteristic = service.getCharacteristics().get(0);
                 batteryLifeCharacteristic = service.getCharacteristics().get(1);
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+                readCharacteristic(batteryLifeCharacteristic);
             } else {
                 Log.w(TAG, "onServiceDiscovered received: " + status);
             }
@@ -252,7 +252,7 @@ public class BluetoothLeService extends Service {
         //SharedPreferences.Editor editor = sharedPreferences.edit();
         int batteryLife = -1;
 
-        readCharacteristic(batteryLifeCharacteristic);
+        //readCharacteristic(batteryLifeCharacteristic);
         if (batteryLifeCharacteristic == null) {
             Log.d(TAG, "Characteristic is null");
         }
@@ -262,7 +262,6 @@ public class BluetoothLeService extends Service {
             Log.d(TAG, "fail");
             return;
         } else {
-
             batteryLife = batteryLifeCharacteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
             Log.d(TAG, "BL = " + batteryLife);
         }
