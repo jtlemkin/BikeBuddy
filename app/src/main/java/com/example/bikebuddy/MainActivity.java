@@ -14,6 +14,8 @@ public class MainActivity extends AppCompatActivity {
     private static int batteryLife = 100;
     private static ParcelUuid currDevice = ParcelUuid.fromString("00000000-0000-0000-0000-000000000000");
     //private static ParcelUuid currDevice = ParcelUuid.fromString("19b10000-e8f2-537e-4f6c-d104768a1214");
+    private static String begID = "19b10000-";
+    private static String endID = "-537e-4f6c-d104768a1214";
 
     public final static String SHOULD_TOGGLE_ALARM = "com.example.bikebuddy.SHOULD_TOGGLE_ALARM";
     public final static String CONFIG_PASSWORD = "com.example.bikebuddy.CONFIG_PASSWORD";
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void addDevice(String id) {
-        registeredDevices[getCounter()] = id;
+        registeredDevices[getCounter()] = begID + id + endID;
         incCounter();
         return;
     }
