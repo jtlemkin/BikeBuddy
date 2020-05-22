@@ -1,10 +1,12 @@
 package com.example.bikebuddy;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.bikebuddy.MainActivity.addDevice;
 import static com.example.bikebuddy.MainActivity.getCounter;
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
 import static com.example.bikebuddy.MainActivity.setCurrDevice;
@@ -42,16 +46,30 @@ class ReportListener implements View.OnClickListener {
     {
         //write to database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //DatabaseReference myRef = database.getReference("message");
-        //myRef.setValue("List of Reported Stolen Bikes");
+        final DatabaseReference myID = database.getReference();
 
-        DatabaseReference myID = database.getReference();
-        myID.child("Stolen Bike UUIDs").child(selectedBike).setValue(selectedBike);
+        final EditText taskEditText = new EditText(context);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setTitle("Report Stolen Bike");
+        dialog.setMessage("Please enter the description of the bike or any information about the robbery.");
+        dialog.setView(taskEditText);
 
-        Log.d(Main.class.getSimpleName(), selectedBike + " SELECTED");
-        CharSequence text = selectedBike + " REPORTED AS STOLEN";
-        Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-        toast.show();
+        dialog.setPositiveButton("Report", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String description = String.valueOf(taskEditText.getText());
+                myID.child("Stolen Bike UUIDs").child(selectedBike).setValue(description);
+
+                Log.d(Main.class.getSimpleName(), selectedBike + " SELECTED");
+                CharSequence text = selectedBike + " REPORTED AS STOLEN";
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+
+        dialog.setNegativeButton("Cancel", null);
+        dialog.create();
+        dialog.show();
     }
 
 };
