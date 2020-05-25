@@ -37,9 +37,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.example.bikebuddy.MainActivity.addDevice;
 import static com.example.bikebuddy.MainActivity.addStolenBike;
 import static com.example.bikebuddy.MainActivity.getBatteryLife;
+import static com.example.bikebuddy.MainActivity.getCounter;
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
+import static com.example.bikebuddy.MainActivity.setCounter;
 import static com.example.bikebuddy.R.id.config_pass;
 import static com.example.bikebuddy.R.id.settings_button;
 
@@ -149,7 +152,7 @@ public class Main extends Fragment implements OnMapReadyCallback {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int i = 0;
                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    String newUUID = snap.getValue(String.class);
+                    String newUUID = snap.getKey();
                     addStolenBike(i, newUUID);
                     i++;
                     Log.d(TAG, newUUID);
@@ -307,6 +310,10 @@ public class Main extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        int size = mPreferences.getInt("count_size", 0);
+        for (int i = 0; i < size; i++) {
+            addDevice(mPreferences.getString("regDevs_" + i, ""));
+        }
     }
 
     @Override
@@ -337,6 +344,13 @@ public class Main extends Fragment implements OnMapReadyCallback {
     public void onPause() {
         mMapView.onPause();
         super.onPause();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        String [] devs = getRegisteredDevices();
+        editor.putInt("count_size", getCounter());
+        for (int i = 0; i < getCounter(); i++) {
+            editor.putString("regDevs_" + i, devs[i].substring(9,13));
+        }
+        editor.apply();
     }
 
     @Override

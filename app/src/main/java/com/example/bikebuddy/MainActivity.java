@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         return counter;
     }
 
+    public static void setCounter(int c) { counter = c; }
+
     public static void incCounter() {
         counter++;
         return;
