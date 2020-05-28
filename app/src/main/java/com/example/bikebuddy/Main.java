@@ -310,6 +310,12 @@ public class Main extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mMapView.onStart();
         int size = mPreferences.getInt("count_size", 0);
         for (int i = 0; i < size; i++) {
             addDevice(mPreferences.getString("regDevs_" + i, ""));
@@ -317,15 +323,16 @@ public class Main extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
         mMapView.onStop();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        String [] devs = getRegisteredDevices();
+        editor.putInt("count_size", getCounter());
+        for (int i = 0; i < getCounter(); i++) {
+            editor.putString("regDevs_" + i, devs[i].substring(9,13));
+        }
+        editor.apply();
     }
 
     @Override
@@ -344,13 +351,6 @@ public class Main extends Fragment implements OnMapReadyCallback {
     public void onPause() {
         mMapView.onPause();
         super.onPause();
-        SharedPreferences.Editor editor = mPreferences.edit();
-        String [] devs = getRegisteredDevices();
-        editor.putInt("count_size", getCounter());
-        for (int i = 0; i < getCounter(); i++) {
-            editor.putString("regDevs_" + i, devs[i].substring(9,13));
-        }
-        editor.apply();
     }
 
     @Override

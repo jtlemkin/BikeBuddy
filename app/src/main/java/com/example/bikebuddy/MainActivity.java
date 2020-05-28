@@ -3,6 +3,7 @@ package com.example.bikebuddy;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.ParcelUuid;
+import android.util.Log;
 
 import java.util.Objects;
 
@@ -66,6 +67,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void addDevice(String id) {
+        boolean redund = false;
+        for (int i = 0; i < getCounter(); i++) {
+            if (registeredDevices[i].equals(begID + id + endID)) {
+                redund = true;
+            }
+        }
+
+        if (redund) {
+            return;
+        }
+
         registeredDevices[getCounter()] = begID + id + endID;
         incCounter();
         return;
