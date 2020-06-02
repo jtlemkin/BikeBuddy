@@ -1,10 +1,12 @@
 package com.example.bikebuddy;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,32 +18,60 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import static com.example.bikebuddy.MainActivity.changeName;
 import static com.example.bikebuddy.MainActivity.getCounter;
+import static com.example.bikebuddy.MainActivity.getNames;
 import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
 import static com.example.bikebuddy.MainActivity.setCurrDevice;
 
 class MyOnClickListener implements View.OnClickListener {
     private Context context;
     private String selectedBike;
+    private String name;
 
-    public MyOnClickListener(String sb, Context c) {
+    public MyOnClickListener(String sb, String n, Context c) {
         this.selectedBike = sb;
+        this.name = n;
         this.context = c;
     }
 
     @Override
     public void onClick(View v)
     {
-        setCurrDevice(selectedBike);
-        Log.d(Main.class.getSimpleName(), selectedBike + " SELECTED");
-        CharSequence text = selectedBike + " SELECTED";
-        Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-        toast.show();
+        final EditText taskEditText = new EditText(context);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setTitle("Registered Bike");
+        dialog.setMessage("You can select a bike to use or change the device's name.");
+        dialog.setView(taskEditText);
+
+        dialog.setPositiveButton("Select", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setCurrDevice(selectedBike);
+                CharSequence text = name + " SELECTED";
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+
+        dialog.setNegativeButton("Change Name", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = String.valueOf(taskEditText.getText());
+                changeName(selectedBike, newName);
+                CharSequence text = "BIKE NAME CHANGED TO " + newName;
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+        dialog.create();
+        dialog.show();
     }
 
 };
@@ -76,11 +106,12 @@ public class listBikes extends Fragment {
         goBack();
 
         String[] bikes = getRegisteredDevices();
+        String[] bikeNames = getNames();
         ArrayList<SettingItem> bikeList = new ArrayList<>();
 
         for (int i = 0; i < getCounter(); i ++) {
-            MyOnClickListener bikeListener = new MyOnClickListener(bikes[i], context);
-            bikeList.add(new SettingItem(R.drawable.ic_directions_bike_black_24dp, bikes[i], bikeListener));
+            MyOnClickListener bikeListener = new MyOnClickListener(bikes[i], bikeNames[i], context);
+            bikeList.add(new SettingItem(R.drawable.ic_directions_bike_black_24dp, bikeNames[i], bikeListener));
         }
 
         mRecyclerView = activity.findViewById(R.id.recyclerView);
