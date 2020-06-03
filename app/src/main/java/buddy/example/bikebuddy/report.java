@@ -1,4 +1,4 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,16 +20,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import buddy.example.bikebuddy.R;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static com.example.bikebuddy.MainActivity.addDevice;
-import static com.example.bikebuddy.MainActivity.getCounter;
-import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
-import static com.example.bikebuddy.MainActivity.setCurrDevice;
+import static buddy.example.bikebuddy.MainActivity.getCounter;
+import static buddy.example.bikebuddy.MainActivity.getRegisteredDevices;
 
 class ReportListener implements View.OnClickListener {
     private Context context;

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    tools:context=".Main">
+    tools:context="buddy.example.bikebuddy.Main">
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"

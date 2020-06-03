@@ -6,7 +6,7 @@
     app:startDestination="@id/main">
     <fragment
         android:id="@+id/main"
-        android:name="com.example.bikebuddy.Main"
+        android:name="buddy.example.bikebuddy.Main"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/settings"
-        android:name="com.example.bikebuddy.Settings"
+        android:name="buddy.example.bikebuddy.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" >
         <action
@@ -34,17 +34,17 @@
         app:popUpToInclusive="true" />
     <activity
         android:id="@+id/qr"
-        android:name="com.example.bikebuddy.qr"
+        android:name="buddy.example.bikebuddy.qr"
         android:label="activity_qr"
         tools:layout="@layout/activity_qr" />
     <fragment
         android:id="@+id/listBikes"
-        android:name="com.example.bikebuddy.listBikes"
+        android:name="buddy.example.bikebuddy.listBikes"
         android:label="fragment_list_bikes"
         tools:layout="@layout/fragment_list_bikes" />
     <fragment
         android:id="@+id/report"
-        android:name="com.example.bikebuddy.report"
+        android:name="buddy.example.bikebuddy.report"
         android:label="fragment_report_list"
-        tools:layout="@layout/fragment_report_list" />
+        tools:layout="@layout/fragment_report" />
 </navigation>

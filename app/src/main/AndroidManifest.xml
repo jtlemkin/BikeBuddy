@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.bikebuddy"
+    package="buddy.example.bikebuddy"
     tools:ignore="GoogleAppIndexingWarning">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -25,15 +25,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".qr" />
+        <activity android:name="buddy.example.bikebuddy.qr" />
 
         <service
-            android:name=".BluetoothLeService"
+            android:name="buddy.example.bikebuddy.BluetoothLeService"
             android:enabled="true"
             android:exported="true"
             android:permission="false" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name="buddy.example.bikebuddy.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

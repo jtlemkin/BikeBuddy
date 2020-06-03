@@ -1,4 +1,4 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,23 +12,22 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
+
+import buddy.example.bikebuddy.R;
 
 import java.util.ArrayList;
 
-import static com.example.bikebuddy.MainActivity.changeName;
-import static com.example.bikebuddy.MainActivity.getCounter;
-import static com.example.bikebuddy.MainActivity.getNames;
-import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
-import static com.example.bikebuddy.MainActivity.setCurrDevice;
+import static buddy.example.bikebuddy.MainActivity.changeName;
+import static buddy.example.bikebuddy.MainActivity.getCounter;
+import static buddy.example.bikebuddy.MainActivity.getNames;
+import static buddy.example.bikebuddy.MainActivity.getRegisteredDevices;
+import static buddy.example.bikebuddy.MainActivity.setCurrDevice;
 
 class MyOnClickListener implements View.OnClickListener {
     private Context context;

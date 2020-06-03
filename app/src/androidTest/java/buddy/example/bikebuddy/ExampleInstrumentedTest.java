@@ -1,4 +1,4 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.bikebuddy", appContext.getPackageName());
+        assertEquals("bike.example.bikebuddy", appContext.getPackageName());
     }
 }

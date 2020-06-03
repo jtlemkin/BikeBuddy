@@ -1,9 +1,11 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.util.Log;
+
+import buddy.example.bikebuddy.R;
 
 import java.util.Objects;
 

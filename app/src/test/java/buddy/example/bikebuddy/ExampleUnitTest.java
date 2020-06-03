@@ -1,4 +1,4 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 import org.junit.Test;
 

@@ -7,7 +7,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
-        applicationId "com.example.bikebuddy"
+        applicationId "buddy.example.bikebuddy"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1

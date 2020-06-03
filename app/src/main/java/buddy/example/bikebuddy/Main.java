@@ -1,4 +1,4 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 
 import android.bluetooth.BluetoothAdapter;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import buddy.example.bikebuddy.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,14 +38,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import static com.example.bikebuddy.MainActivity.addDevice;
-import static com.example.bikebuddy.MainActivity.addStolenBike;
-import static com.example.bikebuddy.MainActivity.getBatteryLife;
-import static com.example.bikebuddy.MainActivity.getCounter;
-import static com.example.bikebuddy.MainActivity.getRegisteredDevices;
-import static com.example.bikebuddy.MainActivity.setCounter;
-import static com.example.bikebuddy.R.id.config_pass;
-import static com.example.bikebuddy.R.id.settings_button;
+import static buddy.example.bikebuddy.MainActivity.addDevice;
+import static buddy.example.bikebuddy.MainActivity.addStolenBike;
+import static buddy.example.bikebuddy.MainActivity.getBatteryLife;
+import static buddy.example.bikebuddy.MainActivity.getCounter;
+import static buddy.example.bikebuddy.MainActivity.getRegisteredDevices;
+import static buddy.example.bikebuddy.R.id.config_pass;
+import static buddy.example.bikebuddy.R.id.settings_button;
 
 
 /*

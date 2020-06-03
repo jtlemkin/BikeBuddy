@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:443181377267:android:09ce4f57a87b3588ecf986",
         "android_client_info": {
-          "package_name": "com.example.bikebuddy"
+          "package_name": "buddy.example.bikebuddy"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "443181377267-c7sgppi1g1lo8vte75ko4l82cb98fvga.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.bikebuddy",
+            "package_name": "buddy.example.bikebuddy",
             "certificate_hash": "f41fca91640ca70df1c749d71fd4d91f2455c0f2"
           }
         },

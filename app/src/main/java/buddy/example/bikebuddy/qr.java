@@ -1,29 +1,23 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.navigation.Navigation;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import buddy.example.bikebuddy.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
-import static com.example.bikebuddy.MainActivity.addDevice;
-import static com.example.bikebuddy.MainActivity.getCounter;
 
 
 public class qr extends AppCompatActivity {
@@ -67,7 +61,7 @@ public class qr extends AppCompatActivity {
                 }
 
                 if (check) {
-                    addDevice(newID);
+                    MainActivity.addDevice(newID);
                 }
                 finish();
             }
@@ -93,7 +87,7 @@ public class qr extends AppCompatActivity {
             }
 
             if (check) {
-                addDevice(dataRead);
+                MainActivity.addDevice(dataRead);
             }
             finish();
         }

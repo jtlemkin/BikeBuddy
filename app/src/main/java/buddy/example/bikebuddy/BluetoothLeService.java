@@ -1,4 +1,4 @@
-package com.example.bikebuddy;
+package buddy.example.bikebuddy;
 
 import android.Manifest;
 import android.app.Service;
@@ -33,10 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
-import static com.example.bikebuddy.MainActivity.getCurrDevice;
-import static com.example.bikebuddy.MainActivity.setBatteryLife;
+import static buddy.example.bikebuddy.MainActivity.getCurrDevice;
+import static buddy.example.bikebuddy.MainActivity.setBatteryLife;
 
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
